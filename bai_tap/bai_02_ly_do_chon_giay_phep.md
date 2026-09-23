@@ -1,0 +1,8 @@
+## Vì sao chọn MIT thay vì GPL cho kho bài tập?
+
+Nhóm em lựa chọn giấy phép **MIT License** thay vì **GPL** cho kho bài tập vì MIT có cách sử dụng đơn giản và linh hoạt hơn. MIT là giấy phép mã nguồn mở có ít điều kiện ràng buộc. Người khác có thể sử dụng, sao chép, chỉnh sửa và phân phối mã nguồn của kho bài tập, miễn là giữ lại thông báo bản quyền và giấy phép. Điều này phù hợp với mục đích của kho bài tập, vì nhóm em muốn các bài làm có thể được tham khảo và sử dụng cho mục đích học tập một cách thuận tiện.
+
+Trong khi đó, GPL có tính “copyleft”, nghĩa là khi phân phối phần mềm phái sinh theo GPL thì phần mã nguồn tương ứng cũng phải được cung cấp theo GPL và đáp ứng các điều kiện của giấy phép. Những yêu cầu này có thể gây khó khăn nếu sau này các bài tập được sử dụng như một phần của dự án khác.
+
+Vì vậy, MIT giúp kho bài tập có **tính mở, dễ chia sẻ và ít ràng buộc**, đồng thời vẫn ghi nhận quyền tác giả của người đóng góp.
+

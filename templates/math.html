@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Máy tính cơ bản</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='math.css') }}">
+</head>
+
+<body>
+
+    <div class="may-tinh">
+        <h2>Máy tính cơ bản</h2>
+
+        <input type="number" id="so1" value="{{ so1 }}" placeholder="Nhập số thứ nhất">
+
+        <input type="number" id="so2" value="{{ so2 }}" placeholder="Nhập số thứ hai">
+
+        <div>
+            <button onclick="tinh('+')">+</button>
+            <button onclick="tinh('-')">-</button>
+            <button onclick="tinh('*')">×</button>
+            <button onclick="tinh('/')">÷</button>
+        </div>
+
+        <div id="ketqua">
+            Kết quả:
+        </div>
+    </div>
+
+    <script>
+    function tinh(phepTinh) {
+        let so1 = Number(document.getElementById("so1").value);
+        let so2 = Number(document.getElementById("so2").value);
+        let ketqua;
+
+        if (phepTinh == "+") {
+            ketqua = so1 + so2;
+        }
+
+        if (phepTinh == "-") {
+            ketqua = so1 - so2;
+        }
+
+        if (phepTinh == "*") {
+            ketqua = so1 * so2;
+        }
+
+        if (phepTinh == "/") {
+            if (so2 == 0) {
+                ketqua = "Không thể chia cho 0";
+            } else {
+                ketqua = so1 / so2;
+            }
+        }
+
+        document.getElementById("ketqua").innerHTML =
+            "Kết quả: " + ketqua;
+    }
+
+    tinh("{{ phepTinh }}");
+    </script>
+
+</body>
+</html>

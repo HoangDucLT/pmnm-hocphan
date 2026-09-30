@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>LibraryMS v0.1</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .available {
+            color: green;
+        }
+
+        .unavailable {
+            color: red;
+        }
+
+        .menu {
+            margin-bottom: 30px;
+        }
+
+        .menu a {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu">
+        <a href="{{ url_for('index') }}">Trang chủ</a>
+        <a href="{{ url_for('books') }}">Danh sách sách</a>
+        <a href="{{ url_for('about') }}">Giới thiệu</a>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

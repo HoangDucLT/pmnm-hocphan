@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>LibraryMS v0.1</h1>
+
+<p>Tổng số sách: {{ total }}</p>
+
+<p>Số sách sẵn sàng cho mượn: {{ available }}</p>
+
+<a href="{{ url_for('books') }}">
+    Xem danh sách sách
+</a>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ book["title"] }}</h1>
+
+<p>
+    <strong>ID:</strong>
+    {{ book["id"] }}
+</p>
+
+<p>
+    <strong>Tác giả:</strong>
+    {{ book["author"] }}
+</p>
+
+<p>
+    <strong>Năm xuất bản:</strong>
+    {{ book["year"] }}
+</p>
+
+<p>
+    <strong>Thể loại:</strong>
+    {{ book["category"] }}
+</p>
+
+<p>
+    <strong>Trạng thái:</strong>
+
+    {% if book["available"] %}
+        <span class="available">Có sẵn</span>
+    {% else %}
+        <span class="unavailable">Đã mượn</span>
+    {% endif %}
+</p>
+
+<p>
+    <a href="{{ url_for('books') }}">← Quay lại danh sách</a>
+</p>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="{{ url_for('search') }}" method="get">
+    <input type="text" name="q" value="{{ q }}" placeholder="Nhập tên hoặc MSSV...">
+    <button type="submit">Tìm kiếm</button>
+</form>
+
+{% if q.strip() %}
+    <p>Tìm thấy <strong>{{ results|length }}</strong> kết quả cho "{{ q }}"</p>
+    {% if results %}
+        <ul>
+            {% for item in results %}
+            <li>
+                <a href="{{ url_for('student_detail', mssv=item.mssv) }}">{{ item.mssv }} - {{ item.name }}</a> ({{ item.lop }})
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endif %}
+{% endblock %}

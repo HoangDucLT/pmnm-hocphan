@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<p>Tổng số sinh viên: <strong>{{ total_students }}</strong></p>
+<p>Số lớp: <strong>{{ total_classes }}</strong></p>
+<ul>
+    <li><a href="{{ url_for('student_list') }}">Xem danh sách sinh viên</a></li>
+    <li><a href="{{ url_for('api_students') }}">API JSON Sinh viên</a></li>
+</ul>
+{% endblock %}

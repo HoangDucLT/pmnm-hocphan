@@ -72,3 +72,48 @@ def student_summary(mssv):
         "average": avg,
         "rank": rank(avg)
     }
+
+@app.route("/")
+def index():
+    total_students = len(STUDENTS)
+    classes = set(s["lop"] for s in STUDENTS.values())
+    total_classes = len(classes)
+    return render_template("index.html", title="Trang chủ", total_students=total_students, total_classes=total_classes)
+
+@app.route("/students")
+def student_list():
+    lop_filter = request.args.get("lop", "").strip()
+    all_classes = sorted(list(set(s["lop"] for s in STUDENTS.values())))
+    filtered_students = [student_summary(m) for m, data in STUDENTS.items() if not lop_filter or data["lop"].upper() == lop_filter.upper()]
+    return render_template("student_list.html", title="Danh sách sinh viên", students=filtered_students, all_classes=all_classes, current_lop=lop_filter)
+
+@app.route("/students/<mssv>")
+def student_detail(mssv):
+    if mssv not in STUDENTS:
+        abort(404, description=f"Không có sinh viên với MSSV = {mssv}.")
+    info = student_summary(mssv)
+    return render_template("student_detail.html", title=f"Chi tiết sinh viên - {info['name']}", info=info, host_url=request.host_url)
+
+@app.route("/sv/<mssv>")
+def short_student_detail(mssv):
+    return redirect(url_for('student_detail', mssv=mssv), code=301)
+
+@app.route("/students/<mssv>/export")
+def export_student_csv(mssv):
+    if mssv not in STUDENTS:
+        abort(404, description=f"Không có sinh viên với MSSV = {mssv}.")
+    scores = STUDENTS[mssv]["scores"]
+    lines = ["hoc_phan,diem"] + [f"{c},{s}" for c, s in scores.items()]
+    response = make_response("\n".join(lines))
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    response.headers["Content-Disposition"] = f"attachment; filename=diem_{mssv}.csv"
+    return response
+
+@app.route("/search")
+def search():
+    q = request.args.get("q", "")
+    results = []
+    if q.strip():
+        q_lower = q.strip().lower()
+        results = [student_summary(m) for m, d in STUDENTS.items() if q_lower in m.lower() or q_lower in d["name"].lower()]
+    return render_template("search.html", title="Tìm kiếm sinh viên", q=q, results=results)

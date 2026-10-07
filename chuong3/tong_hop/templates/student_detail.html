@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<p><strong>MSSV:</strong> {{ info.mssv }}</p>
+<p><strong>Họ tên:</strong> {{ info.name }}</p>
+<p><strong>Lớp:</strong> <a href="{{ url_for('student_list', lop=info.lop) }}">{{ info.lop }}</a></p>
+<p><strong>Điểm trung bình:</strong> {% if info.average is not none %}{{ "%.2f"|format(info.average) }}{% else %}Chưa có{% endif %}</p>
+<p><strong>Xếp loại:</strong> {{ info.rank }}</p>
+<p><strong>Link rút gọn:</strong> <a href="{{ url_for('short_student_detail', mssv=info.mssv) }}">{{ host_url[:-1] }}{{ url_for('short_student_detail', mssv=info.mssv) }}</a></p>
+<p><a href="{{ url_for('export_student_csv', mssv=info.mssv) }}">Tải bảng điểm (CSV)</a></p>
+
+<h3>Bảng điểm chi tiết</h3>
+<table>
+    <thead>
+        <tr><th>Học phần</th><th>Điểm</th></tr>
+    </thead>
+    <tbody>
+        {% for course, score in info.scores.items() %}
+        <tr>
+            <td>{{ course }}</td>
+            <td>{{ score }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2">Chưa có điểm học phần nào</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

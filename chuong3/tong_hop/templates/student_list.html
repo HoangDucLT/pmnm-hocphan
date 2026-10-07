@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="filter-bar">
+    Lọc theo lớp: 
+    <a href="{{ url_for('student_list') }}" class="{% if not current_lop %}active{% endif %}">Tất cả</a>
+    {% for c in all_classes %}
+        <a href="{{ url_for('student_list', lop=c) }}" class="{% if current_lop.upper() == c.upper() %}active{% endif %}">{{ c }}</a>
+    {% endfor %}
+</div>
+
+{% if not students %}
+    <p>Không có sinh viên phù hợp.</p>
+{% else %}
+    <table>
+        <thead>
+            <tr>
+                <th>MSSV</th>
+                <th>Họ tên</th>
+                <th>Lớp</th>
+                <th>Điểm TB</th>
+                <th>Xếp loại</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td><a href="{{ url_for('student_detail', mssv=s.mssv) }}">{{ s.mssv }}</a></td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.lop }}</td>
+                <td>{% if s.average is not none %}{{ "%.2f"|format(s.average) }}{% else %}—{% endif %}</td>
+                <td>{{ s.rank }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

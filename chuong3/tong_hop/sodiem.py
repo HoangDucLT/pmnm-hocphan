@@ -117,3 +117,72 @@ def search():
         q_lower = q.strip().lower()
         results = [student_summary(m) for m, d in STUDENTS.items() if q_lower in m.lower() or q_lower in d["name"].lower()]
     return render_template("search.html", title="Tìm kiếm sinh viên", q=q, results=results)
+
+@app.route("/api/students", methods=["GET"])
+def api_students():
+    lop_filter = request.args.get("lop", "").strip()
+    min_avg_raw = request.args.get("min_avg")
+    min_avg = None
+    if min_avg_raw is not None:
+        try:
+            min_avg = float(min_avg_raw)
+        except ValueError:
+            abort(400, description="Tham số min_avg phải là một số thực hợp lệ.")
+            
+    res = []
+    for mssv in STUDENTS:
+        info = student_summary(mssv)
+        if lop_filter and info["lop"].upper() != lop_filter.upper():
+            continue
+        if min_avg is not None and (info["average"] is None or info["average"] < min_avg):
+            continue
+        res.append(info)
+    return jsonify(res)
+
+@app.route("/api/students/<mssv>", methods=["GET"])
+def api_student_detail(mssv):
+    info = student_summary(mssv)
+    if info is None:
+        abort(404, description=f"Không có sinh viên với MSSV = {mssv}.")
+    return jsonify(info)
+
+@app.route("/api/students/<mssv>/scores/<course>", methods=["GET", "PUT", "DELETE"])
+def api_course_score(mssv, course):
+    course_upper = course.upper()
+    if mssv not in STUDENTS:
+        abort(404, description=f"Không tìm thấy sinh viên với MSSV = {mssv}.")
+        
+    student_scores = STUDENTS[mssv]["scores"]
+    
+    if request.method == "GET":
+        if course_upper not in student_scores:
+            abort(404, description=f"Sinh viên không có điểm môn {course_upper}.")
+        return jsonify({"mssv": mssv, "course": course_upper, "score": student_scores[course_upper]})
+        
+    elif request.method == "PUT":
+        score_raw = request.args.get("score")
+        if score_raw is None:
+            abort(400, description="Thiếu tham số 'score'.")
+        try:
+            score = float(score_raw)
+        except ValueError:
+            abort(400, description="Tham số 'score' phải là số.")
+            
+        if score < 0 or score > 10:
+            abort(400, description="Điểm 'score' phải nằm trong khoảng từ 0 đến 10.")
+            
+        is_new = course_upper not in student_scores
+        student_scores[course_upper] = score
+        response_data = {"mssv": mssv, "course": course_upper, "score": score, "average": average(student_scores)}
+        
+        if is_new:
+            resp = make_response(jsonify(response_data), 201)
+            resp.headers["Location"] = url_for('api_course_score', mssv=mssv, course=course_upper)
+            return resp
+        return jsonify(response_data), 200
+            
+    elif request.method == "DELETE":
+        if course_upper not in student_scores:
+            abort(404, description=f"Không tìm thấy điểm môn {course_upper} để xóa.")
+        del student_scores[course_upper]
+        return "", 204

@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Mã lỗi: {{ status_code }}</h2>
+<p><strong>Mô tả:</strong> {{ description }}</p>
+<p><a href="{{ url_for('index') }}">Quay lại trang chủ</a></p>
+{% endblock %}

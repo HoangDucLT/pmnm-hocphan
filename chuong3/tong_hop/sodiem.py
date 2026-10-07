@@ -186,3 +186,18 @@ def api_course_score(mssv, course):
             abort(404, description=f"Không tìm thấy điểm môn {course_upper} để xóa.")
         del student_scores[course_upper]
         return "", 204
+@app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(405)
+def handle_error(error):
+    status_code = getattr(error, 'code', 500)
+    title_map = {400: "Dữ liệu không hợp lệ", 404: "Không tìm thấy", 405: "Phương thức không được hỗ trợ"}
+    title = title_map.get(status_code, "Lỗi hệ thống")
+    description = getattr(error, 'description', str(error))
+    
+    if request.path.startswith("/api/"):
+        return jsonify({"error": title, "detail": description}), status_code
+    return render_template("error.html", title=f"Lỗi {status_code} - {title}", status_code=status_code, description=description), status_code
+
+if __name__ == "__main__":
+    app.run(port=8000, debug=True)

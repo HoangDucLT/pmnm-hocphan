@@ -35,23 +35,17 @@ def index():
 def menu():
     page = request.args.get("page", 1, type=int)
     total_items = len(MENU)
-
     if total_items == 0:
         pages = 1
         items_on_page = []
     else:
-        pages = math.ceil(total_items / PER_PAGE)
-        
-        # Nếu nhập trang nhỏ hơn 1 hoặc lớn hơn tổng số trang -> Trả về lỗi 404
+        pages = math.ceil(total_items / PER_PAGE) 
         if page < 1 or page > pages:
             abort(404)
-
         start = (page - 1) * PER_PAGE
         end = start + PER_PAGE
         items_on_page = MENU[start:end]
-
     avg_price = sum(item["price"] for item in MENU) / total_items if total_items > 0 else 0
-
     return render_template(
         "menu.html", 
         menu=items_on_page, 
@@ -59,13 +53,11 @@ def menu():
         pages=pages, 
         avg_price=avg_price
     )
-
 @app.route("/content")
 def content():
     return render_template("content.html", shop=SHOP)
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
-
 if __name__ == "__main__":
     app.run(debug=True)

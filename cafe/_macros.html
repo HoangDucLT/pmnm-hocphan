@@ -1,0 +1,24 @@
+{% macro item_card(item) %}
+    <li class="{% if not item.available %}het-hang{% endif %}">
+        <strong>{{ item.name | capitalize }}</strong> - {{ item.price }} VND
+        {% if item.available %}
+            (Còn hàng)
+        {% else %}
+            (Hết hàng)
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% macro pagination(page, pages, endpoint) %}
+    {% if pages > 1 %}
+        <div class="pagination">
+            {% for p in range(1, pages + 1) %}
+                {% if p == page %}
+                    <strong class="active-page">{{ p }}</strong>
+                {% else %}
+                    <a href="{{ url_for(endpoint, page=p) }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}

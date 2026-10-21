@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang chủ - Cà phê Sông Hương{% endblock %}
+
+{% block content %}
+    <h1>{{ shop.name }}</h1>
+    <p><strong>Địa chỉ:</strong> {{ shop.address }}</p>
+    <p><strong>Giờ mở cửa:</strong> {{ shop.open_hour }}h00 - {{ shop.closed_hour }}h00</p>
+    <p>
+        <strong>Trạng thái ({{ hour }}h):</strong> 
+        {% if is_open %}
+            <span style="color: green;">Đang mở cửa</span>
+        {% else %}
+            <span style="color: red;">Đã đóng cửa</span>
+        {% endif %}
+    </p>
+{% endblock %}

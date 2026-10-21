@@ -12,13 +12,13 @@ SHOP = {
 }
 
 MENU = [
-    {"name": "cà phê đen", "price": 20000, "available": True},
-    {"name": "bạc xỉu", "price": 25000, "available": False},
-    {"name": "cà phê sữa", "price": 25000, "available": True},
-    {"name": "trà đào", "price": 30000, "available": True},
-    {"name": "nước cam", "price": 20000, "available": False},
-    {"name": "trà sữa", "price": 35000, "available": True},
-    {"name": "sinh tố bơ", "price": 40000, "available": True}
+    {"name": "cà phê đen", "price": "20,000", "available": True},
+    {"name": "bạc xỉu", "price": "25,000", "available": False},
+    {"name": "cà phê sữa", "price": "25,000", "available": True},
+    {"name": "trà đào", "price": "30,000", "available": True},
+    {"name": "nước cam", "price": "20,000", "available": False},
+    {"name": "trà sữa", "price": "35,000", "available": True},
+    {"name": "sinh tố bơ", "price": "40,000", "available": True}
 ]
 
 PER_PAGE = 3  # Mỗi trang 3 món
@@ -45,7 +45,7 @@ def menu():
         start = (page - 1) * PER_PAGE
         end = start + PER_PAGE
         items_on_page = MENU[start:end]
-    avg_price = sum(item["price"] for item in MENU) / total_items if total_items > 0 else 0
+    avg_price = int(round(sum(int(item["price"].replace(",", "")) for item in MENU) / total_items, -3)) if total_items > 0 else 0
     return render_template(
         "menu.html", 
         menu=items_on_page, 

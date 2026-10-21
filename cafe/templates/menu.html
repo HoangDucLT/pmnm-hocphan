@@ -14,7 +14,7 @@
 {% block content %}
     <h1>Thực đơn</h1>
     
-    <p><strong>Giá trung bình:</strong> {{ avg_price }} VND</p>
+    <p><strong>Giá trung bình:</strong> {{ "{:,}".format(avg_price) }} VND</p>
 
     <ul>
         {% for item in menu %}

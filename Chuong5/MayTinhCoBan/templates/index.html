@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Máy tính cơ bản</title>
+  <style>
+    :root { --nen:#3b4b5c; --than:#d9ded6; --muc:#1f2a1a; --nhan:#3c4636; --lcd:#c4d0a2; --lcd-chu:#27321b;
+            --phim:#f6f8f3; --vien:#a9b2a3; --vang:#f0a30a; --vang-toi:#b97a00; --loi:#a4161a; --focus:#1d4ed8; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px 12px;
+           background:var(--nen); color:var(--muc); font:16px/1.5 system-ui, "Segoe UI", sans-serif; }
+    main { width:min(440px, 100%); padding:26px 24px 28px; border-radius:26px; background:var(--than);
+           box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 28px 44px -20px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.12); }
+    h1 { margin:0 0 16px; font-size:1.05rem; font-weight:700; letter-spacing:.02em; color:var(--nhan); }
+
+    .lcd { min-height:4.6rem; margin-bottom:22px; padding:12px 16px; border-radius:10px; background:var(--lcd); color:var(--lcd-chu);
+           box-shadow: inset 0 3px 7px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.75);
+           font:600 clamp(1.5rem, 6vw, 2.2rem)/2.4rem ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+           text-align:right; white-space:nowrap; overflow-x:auto; font-variant-numeric: tabular-nums; }
+    .lcd.trong { opacity:.5; }
+
+    .hang { display:grid; grid-template-columns:1fr 5rem 1fr; gap:14px; align-items:start; }
+    label { display:block; margin-bottom:6px; font-size:.85rem; font-weight:600; color:var(--nhan); }
+    input, select { width:100%; height:3rem; padding:0 12px; border:1px solid var(--vien); border-radius:10px;
+                    background:var(--phim); color:var(--muc); box-shadow:0 2px 0 var(--vien);
+                    font:600 1.2rem ui-monospace, Menlo, Consolas, monospace; }
+    input { text-align:right; }
+    select { text-align:center; text-align-last:center; cursor:pointer; }
+    input:focus-visible, select:focus-visible, button:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+    .invalid { border-color:var(--loi); background:#fff6f5; }
+    .error { margin:6px 0 0; color:var(--loi); font-size:.88rem; line-height:1.35; }
+
+    button { width:100%; margin-top:22px; height:3.4rem; border:0; border-radius:14px; cursor:pointer;
+             background:var(--vang); color:#2b1c00; font-size:1.1rem; font-weight:800;
+             box-shadow:0 5px 0 var(--vang-toi); transition: transform .08s, box-shadow .08s; }
+    button:active { transform:translateY(3px); box-shadow:0 2px 0 var(--vang-toi); }
+
+    @media (max-width:480px) { .hang { grid-template-columns:1fr; gap:12px; } }
+    @media (prefers-reduced-motion: reduce) { button { transition:none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Máy tính cơ bản</h1>
+
+    <div class="lcd {{ '' if result else 'trong' }}" role="status">{{ result if result else '0' }}</div>
+
+    <form method="post" action="" novalidate>
+      <div class="hang">
+        <div>
+          <label for="a">Số thứ nhất</label>
+          <input type="text" id="a" name="a" value="{{ form.a }}" inputmode="decimal" class="{{ 'invalid' if errors.a }}">
+          {% if errors.a %}<p class="error">Lỗi ô a: {{ errors.a }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label for="op">Phép toán</label>
+          <select id="op" name="op">
+            {% for o in ['+', '-', '*', '/'] %}
+            <option value="{{ o }}" {{ 'selected' if form.op == o }}>{{ o }}</option>
+            {% endfor %}
+          </select>
+          {% if errors.op %}<p class="error">{{ errors.op }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label for="b">Số thứ hai</label>
+          <input type="text" id="b" name="b" value="{{ form.b }}" inputmode="decimal" class="{{ 'invalid' if errors.b }}">
+          {% if errors.b %}<p class="error">Lỗi ô b: {{ errors.b }}</p>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit">Tính</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Sửa' if category else 'Thêm' }} danh mục{% endblock %}
+{% block content %}
+<h3 class="mb-3">{{ 'Sửa danh mục' if category else 'Thêm danh mục' }}</h3>
+<form method="post" class="card card-body" style="max-width:600px">
+    <div class="mb-3">
+        <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+        <input type="text" name="name" class="form-control" required
+               value="{{ request.form.get('name', category.name if category else '') }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea name="description" rows="3" class="form-control">{{ request.form.get('description', category.description if category else '') }}</textarea>
+    </div>
+    <div>
+        <button class="btn btn-primary">Lưu</button>
+        <a href="{{ url_for('categories') }}" class="btn btn-secondary">Hủy</a>
+    </div>
+</form>
+{% endblock %}

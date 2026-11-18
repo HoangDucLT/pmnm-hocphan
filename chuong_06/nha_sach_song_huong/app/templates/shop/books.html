@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Sách – Nhà sách Sông Hương{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <h1 class="h3 font-serif mb-1">Tủ sách</h1>
+  <p class="text-muted mb-0">{{ books|length }} đầu sách{% if q or category_id %} phù hợp với bộ lọc{% endif %}</p>
+</div>
+
+<form method="get" action="{{ url_for('shop.books') }}" class="row g-2 mb-4">
+  <div class="col-md-6">
+    <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Tìm theo tên sách hoặc tác giả">
+  </div>
+  <div class="col-md-4">
+    <select name="category_id" class="form-select" aria-label="Lọc theo danh mục">
+      <option value="">Mọi danh mục</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}" {{ 'selected' if category_id == c.id }}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid">
+    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Tìm</button>
+  </div>
+</form>
+
+{% if books %}
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+  {% for book in books %}
+  <div class="col">
+    <article class="book-card">
+      <a href="{{ url_for('shop.book_detail', book_id=book.id) }}">
+        <img class="book-cover" src="{{ cover_url(book) }}" alt="Bìa sách {{ book.title }}" loading="lazy">
+      </a>
+      <div class="card-body">
+        <a class="book-title mb-1" href="{{ url_for('shop.book_detail', book_id=book.id) }}">{{ book.title }}</a>
+        <div class="text-muted small mb-2">{{ book.author }}</div>
+        <div class="book-price">{{ book.price|vnd }}</div>
+        {% if book.stock > 0 %}
+          <div class="stock-ok mb-3">Còn {{ book.stock }}</div>
+        {% else %}
+          <div class="stock-out mb-3">Hết hàng</div>
+        {% endif %}
+        <form method="post" action="{{ url_for('shop.cart_add', book_id=book.id) }}" class="mt-auto">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+          {% if book.stock > 0 %}
+            <button type="submit" class="btn btn-outline-primary btn-sm w-100">+ Thêm vào giỏ</button>
+          {% else %}
+            <button type="button" class="btn btn-outline-secondary btn-sm w-100" disabled>Hết hàng</button>
+          {% endif %}
+        </form>
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="panel p-5 text-center">
+  <p class="mb-2">Không tìm thấy sách phù hợp.</p>
+  <a href="{{ url_for('shop.books') }}" class="btn btn-outline-primary btn-sm">Xoá bộ lọc</a>
+</div>
+{% endif %}
+{% endblock %}

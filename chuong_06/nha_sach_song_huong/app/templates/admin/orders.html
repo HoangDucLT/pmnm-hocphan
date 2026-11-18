@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import status_badge, pagination as render_pagination %}
+{% block title %}Đơn hàng{% endblock %}
+{% block content %}
+<h1 class="h3 font-serif mb-3">Đơn hàng</h1>
+
+<ul class="nav nav-pills mb-3 gap-1">
+  <li class="nav-item">
+    <a class="nav-link {{ 'active' if not status }}" href="{{ url_for('admin.orders', q=q or None) }}">Tất cả <span class="badge text-bg-light ms-1">{{ all_count }}</span></a>
+  </li>
+  {% for s in statuses %}
+  <li class="nav-item">
+    <a class="nav-link {{ 'active' if status == s }}" href="{{ url_for('admin.orders', status=s, q=q or None) }}">{{ s }} <span class="badge text-bg-light ms-1">{{ counts.get(s, 0) }}</span></a>
+  </li>
+  {% endfor %}
+</ul>
+
+<form method="get" action="{{ url_for('admin.orders') }}" class="row g-2 mb-3">
+  {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+  <div class="col-md-6 col-lg-5"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Tìm theo mã đơn, tên khách hàng hoặc số điện thoại"></div>
+  <div class="col-auto"><button type="submit" class="btn btn-outline-primary">Tìm</button></div>
+  {% if q %}<div class="col-auto"><a href="{{ url_for('admin.orders', status=status or None) }}" class="btn btn-link">Xoá từ khoá</a></div>{% endif %}
+</form>
+
+<div class="table-wrap">
+  <div class="table-responsive">
+    <table class="table align-middle table-hover">
+      <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Số điện thoại</th><th>Ngày đặt</th><th class="text-end">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+      <tbody>
+        {% for o in pagination.items %}
+        <tr>
+          <td><a class="fw-semibold" href="{{ url_for('admin.order_detail', order_id=o.id) }}">#{{ o.id }}</a></td>
+          <td>{{ o.customer_name }}</td>
+          <td>{{ o.customer_phone }}</td>
+          <td class="text-nowrap">{{ o.created_at|dt }}</td>
+          <td class="text-end">{{ o.total_amount|vnd }}</td>
+          <td>{{ status_badge(o.status) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-5">Không có đơn hàng nào phù hợp.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light">
+        <tr>
+          <td colspan="4" class="fw-semibold">Tổng cộng theo bộ lọc hiện tại: {{ total_orders }} đơn</td>
+          <td class="text-end fw-bold">{{ total_value|vnd }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="d-flex justify-content-end mt-3">
+  {{ render_pagination(pagination, 'admin.orders', filters) }}
+</div>
+{% endblock %}

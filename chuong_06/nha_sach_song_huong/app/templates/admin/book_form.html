@@ -1,0 +1,43 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import form_field %}
+{% block title %}{{ 'Sửa sách' if book else 'Thêm sách' }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 font-serif mb-0">{{ 'Sửa sách' if book else 'Thêm sách mới' }}</h1>
+  <a href="{{ url_for('admin.books') }}" class="btn btn-outline-secondary btn-sm">&lsaquo; Danh sách sách</a>
+</div>
+
+{% if form.category_id.choices|length <= 1 %}
+<div class="alert alert-warning">Chưa có danh mục nào. Hãy <a href="{{ url_for('admin.categories') }}">tạo danh mục</a> trước khi thêm sách.</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="panel p-4" novalidate
+      action="{{ url_for('admin.book_form', book_id=book.id) if book else url_for('admin.book_form') }}">
+  {{ form.csrf_token }}
+  <div class="row g-3">
+    <div class="col-lg-8">
+      {{ form_field(form.title, required=True) }}
+      <div class="row">
+        <div class="col-md-6">{{ form_field(form.author, required=True) }}</div>
+        <div class="col-md-6">{{ form_field(form.publisher) }}</div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">{{ form_field(form.publish_year, help="Từ 1900 đến năm hiện tại.") }}</div>
+        <div class="col-md-4">{{ form_field(form.price, required=True, min="1000", step="1000") }}</div>
+        <div class="col-md-4">{{ form_field(form.stock, required=True, min="0") }}</div>
+      </div>
+      {{ form_field(form.category_id, required=True) }}
+      {{ form_field(form.description, rows=5) }}
+    </div>
+    <div class="col-lg-4">
+      <label class="form-label">Ảnh bìa hiện tại</label>
+      <img class="book-cover rounded border mb-3" style="max-width: 220px;" src="{{ cover_url(book) }}" alt="Ảnh bìa">
+      {{ form_field(form.cover_image, help="JPG, PNG hoặc WEBP, tối đa 2 MB." ~ (" Chọn ảnh mới để thay thế ảnh cũ." if book else ""), accept=".jpg,.jpeg,.png,.webp") }}
+    </div>
+  </div>
+  <div class="d-flex gap-2 mt-2">
+    <button type="submit" class="btn btn-primary px-4">{{ 'Lưu thay đổi' if book else 'Thêm sách' }}</button>
+    <a href="{{ url_for('admin.books') }}" class="btn btn-outline-secondary">Huỷ</a>
+  </div>
+</form>
+{% endblock %}

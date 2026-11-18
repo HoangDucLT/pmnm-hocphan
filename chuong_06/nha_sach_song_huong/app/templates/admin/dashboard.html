@@ -1,0 +1,86 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Tổng quan{% endblock %}
+{% block content %}
+<h1 class="h3 font-serif mb-4">Tổng quan</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Tổng đầu sách</div><div class="stat-value">{{ total_books }}</div></div></div>
+  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Đơn chờ xác nhận</div><div class="stat-value">{{ pending_orders }}</div></div></div>
+  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Doanh thu tháng này</div><div class="stat-value">{{ revenue_month|vnd }}</div></div></div>
+  <div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="stat-label">Sách sắp hết hàng (≤ {{ threshold }})</div><div class="stat-value {{ 'stock-zero' if low_stock_count }}">{{ low_stock_count }}</div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="table-wrap">
+      <div class="d-flex justify-content-between align-items-center px-3 pt-3">
+        <h2 class="h6 fw-semibold mb-0">5 đơn hàng mới nhất</h2>
+        <a href="{{ url_for('admin.orders') }}" class="small">Xem tất cả</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mt-2">
+          <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th class="text-end">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            {% for o in latest_orders %}
+            <tr>
+              <td><a href="{{ url_for('admin.order_detail', order_id=o.id) }}">#{{ o.id }}</a></td>
+              <td>{{ o.customer_name }}</td>
+              <td class="text-end">{{ o.total_amount|vnd }}</td>
+              <td>{{ status_badge(o.status) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-5">
+    <div class="table-wrap">
+      <div class="px-3 pt-3"><h2 class="h6 fw-semibold mb-0">Sách sắp hết hàng</h2></div>
+      <div class="table-responsive">
+        <table class="table align-middle mt-2">
+          <thead><tr><th>Tên sách</th><th class="text-center">Tồn kho</th><th></th></tr></thead>
+          <tbody>
+            {% for b in low_stock_books %}
+            <tr>
+              <td>{{ b.title }}</td>
+              <td class="text-center {{ 'stock-zero' if b.stock == 0 }}">{{ b.stock }}</td>
+              <td class="text-end"><a href="{{ url_for('admin.book_form', book_id=b.id) }}" class="btn btn-outline-primary btn-sm">Sửa</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-muted py-4">Không có sách nào sắp hết hàng.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel p-3 mt-4">
+  <h2 class="h6 fw-semibold">Doanh thu 7 ngày gần nhất <span class="text-muted fw-normal">(đơn hoàn tất)</span></h2>
+  <div style="height: 260px;"><canvas id="revenueChart" aria-label="Biểu đồ doanh thu 7 ngày gần nhất" role="img"></canvas></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ chart_labels|tojson }},
+      datasets: [{ label: 'Doanh thu (₫)', data: {{ chart_values|tojson }}, backgroundColor: '#1f5f5b', borderRadius: 4 }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { callback: function (v) { return v.toLocaleString('vi-VN'); } } } }
+    }
+  });
+</script>
+{% endblock %}

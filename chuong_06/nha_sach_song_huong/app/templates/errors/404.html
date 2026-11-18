@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Không tìm thấy trang – Nhà sách Sông Hương{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="font-serif display-5">404</h1>
+  <p class="lead text-muted">Trang bạn tìm không tồn tại hoặc đã bị xoá.</p>
+  <a href="{{ url_for('shop.books') }}" class="btn btn-primary">Quay lại danh sách sách</a>
+</div>
+{% endblock %}

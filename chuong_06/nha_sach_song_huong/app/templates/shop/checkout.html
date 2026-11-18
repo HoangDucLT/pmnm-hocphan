@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import form_field %}
+{% block title %}Thanh toán – Nhà sách Sông Hương{% endblock %}
+{% block content %}
+<h1 class="h3 font-serif mb-3">Thông tin khách hàng</h1>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <form method="post" action="{{ url_for('shop.checkout') }}" class="panel p-4" novalidate>
+      {{ form.csrf_token }}
+      {{ form_field(form.customer_name, required=True, placeholder="Nguyễn Văn A") }}
+      {{ form_field(form.customer_phone, required=True, placeholder="0912345678", inputmode="numeric", maxlength="10") }}
+      {{ form_field(form.shipping_address, required=True, rows=3, placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành") }}
+      {{ form_field(form.customer_email, help="Không bắt buộc. Dùng để gửi xác nhận đơn hàng.", placeholder="ban@example.com") }}
+      {{ form_field(form.note, rows=2, placeholder="Ví dụ: giao giờ hành chính") }}
+      {{ form_field(form.payment_method, required=True) }}
+      <div class="d-flex flex-wrap gap-2 justify-content-between mt-4">
+        <a href="{{ url_for('shop.cart') }}" class="btn btn-outline-secondary">&lsaquo; Quay lại giỏ hàng</a>
+        <button type="submit" class="btn btn-primary px-4">Xác nhận đặt hàng</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="col-lg-5">
+    <aside class="panel p-4 summary-sticky">
+      <h2 class="h5 font-serif mb-3">Tóm tắt đơn hàng</h2>
+      <ul class="list-unstyled mb-3">
+        {% for item in items %}
+        <li class="d-flex justify-content-between gap-3 py-2 border-bottom">
+          <span>{{ item.book.title }} <span class="text-muted">&times; {{ item.quantity }}</span></span>
+          <span class="text-nowrap">{{ item.line_total|vnd }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="d-flex justify-content-between mb-1"><span>Tạm tính</span><span>{{ subtotal|vnd }}</span></div>
+      <div class="d-flex justify-content-between mb-1">
+        <span>Phí giao hàng</span>
+        <span>{% if shipping_fee == 0 %}Miễn phí{% else %}{{ shipping_fee|vnd }}{% endif %}</span>
+      </div>
+      {% if shipping_fee > 0 %}
+        <div class="form-text mb-2">Miễn phí giao hàng cho đơn từ {{ free_ship_from|vnd }}.</div>
+      {% endif %}
+      <hr>
+      <div class="d-flex justify-content-between fs-5 fw-bold">
+        <span>Tổng thanh toán</span><span class="book-price">{{ total|vnd }}</span>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

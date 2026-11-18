@@ -1,0 +1,49 @@
+{% macro flashes() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      {% set level = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+      <div class="alert alert-{{ level }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+      </div>
+    {% endfor %}
+  {% endwith %}
+{% endmacro %}
+
+{% macro form_field(f, required=False, help=None) %}
+  <div class="mb-3">
+    <label for="{{ f.id }}" class="form-label">{{ f.label.text }}{% if required %} <span class="text-danger">*</span>{% endif %}</label>
+    {% set base = 'form-select' if f.type == 'SelectField' else 'form-control' %}
+    {{ f(class_=base ~ (' is-invalid' if f.errors else ''), **kwargs) }}
+    {% if f.errors %}<div class="invalid-feedback d-block">{{ f.errors[0] }}</div>{% endif %}
+    {% if help %}<div class="form-text">{{ help }}</div>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  <span class="badge status-badge {{ status|status_class }}">{{ status }}</span>
+{% endmacro %}
+
+{% macro pagination(pag, endpoint, filters) %}
+  {% if pag.pages > 1 %}
+  <nav aria-label="Phân trang">
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item {{ 'disabled' if not pag.has_prev }}">
+        <a class="page-link" href="{{ url_for(endpoint, page=pag.prev_num, **filters) if pag.has_prev else '#' }}">&lsaquo; Trước</a>
+      </li>
+      {% for p in pag.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+          <li class="page-item {{ 'active' if p == pag.page }}">
+            <a class="page-link" href="{{ url_for(endpoint, page=p, **filters) }}">{{ p }}</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+        {% endif %}
+      {% endfor %}
+      <li class="page-item {{ 'disabled' if not pag.has_next }}">
+        <a class="page-link" href="{{ url_for(endpoint, page=pag.next_num, **filters) if pag.has_next else '#' }}">Sau &rsaquo;</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+{% endmacro %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }} – Nhà sách Sông Hương{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('shop.books') }}">Sách</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('shop.books', category_id=book.category_id) }}">{{ book.category.name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+  </ol>
+</nav>
+
+<div class="panel p-4">
+  <div class="row g-4">
+    <div class="col-md-4 col-lg-3">
+      <img class="book-cover rounded" src="{{ cover_url(book) }}" alt="Bìa sách {{ book.title }}">
+    </div>
+    <div class="col-md-8 col-lg-9">
+      <h1 class="h3 font-serif">{{ book.title }}</h1>
+      <dl class="row mb-3">
+        <dt class="col-sm-3 col-lg-2 fw-medium text-muted">Tác giả</dt><dd class="col-sm-9 col-lg-10">{{ book.author }}</dd>
+        <dt class="col-sm-3 col-lg-2 fw-medium text-muted">Nhà xuất bản</dt><dd class="col-sm-9 col-lg-10">{{ book.publisher or '—' }}</dd>
+        <dt class="col-sm-3 col-lg-2 fw-medium text-muted">Năm xuất bản</dt><dd class="col-sm-9 col-lg-10">{{ book.publish_year or '—' }}</dd>
+        <dt class="col-sm-3 col-lg-2 fw-medium text-muted">Danh mục</dt><dd class="col-sm-9 col-lg-10">{{ book.category.name }}</dd>
+        <dt class="col-sm-3 col-lg-2 fw-medium text-muted">Tồn kho</dt>
+        <dd class="col-sm-9 col-lg-10">
+          {% if book.stock > 0 %}Còn {{ book.stock }} cuốn{% else %}<span class="stock-out">Hết hàng</span>{% endif %}
+        </dd>
+      </dl>
+
+      <div class="book-price fs-3 mb-3">{{ book.price|vnd }}</div>
+
+      <form method="post" action="{{ url_for('shop.book_add', book_id=book.id) }}" class="mb-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="qty" class="form-label fw-medium">Số lượng</label>
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <div class="input-group" style="width: 9.5rem;">
+            <button class="btn btn-outline-secondary" type="button" id="qty-minus" aria-label="Giảm" {{ 'disabled' if max_addable == 0 }}>&minus;</button>
+            <input type="number" class="form-control text-center" id="qty" name="quantity" value="1" min="1" max="{{ max_addable }}" {{ 'disabled' if max_addable == 0 }}>
+            <button class="btn btn-outline-secondary" type="button" id="qty-plus" aria-label="Tăng" {{ 'disabled' if max_addable == 0 }}>+</button>
+          </div>
+          <button type="submit" class="btn btn-primary" {{ 'disabled' if max_addable == 0 }}><i class="bi bi-cart-plus"></i> Thêm vào giỏ</button>
+        </div>
+        <div class="form-text mt-2">
+          {% if book.stock == 0 %}
+            Sách tạm hết hàng.
+          {% elif max_addable == 0 %}
+            Bạn đã thêm tối đa {{ in_cart }} cuốn còn trong kho vào giỏ hàng.
+          {% else %}
+            Tối đa có thể thêm: {{ max_addable }} cuốn{% if in_cart %} (trong giỏ đã có {{ in_cart }}){% endif %}.
+          {% endif %}
+        </div>
+      </form>
+
+      <h2 class="h6 fw-semibold">Mô tả</h2>
+      <p class="mb-0" style="white-space: pre-line;">{{ book.description or 'Chưa có mô tả cho cuốn sách này.' }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var input = document.getElementById('qty');
+    var max = parseInt(input.getAttribute('max'), 10) || 0;
+    function clamp(v) { v = parseInt(v, 10) || 1; return Math.max(1, Math.min(v, max || 1)); }
+    document.getElementById('qty-minus').addEventListener('click', function () { input.value = clamp(parseInt(input.value, 10) - 1); });
+    document.getElementById('qty-plus').addEventListener('click', function () { input.value = clamp(parseInt(input.value, 10) + 1); });
+  })();
+</script>
+{% endblock %}

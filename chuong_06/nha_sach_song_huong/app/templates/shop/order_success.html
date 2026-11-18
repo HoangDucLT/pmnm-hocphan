@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Đơn hàng #{{ order.id }} – Nhà sách Sông Hương{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+  <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+  <h1 class="h3 font-serif mt-2 mb-1">Đặt hàng thành công</h1>
+  <p class="text-muted mb-0">Mã đơn hàng của bạn là <strong>#{{ order.id }}</strong>. Nhà sách sẽ sớm liên hệ để xác nhận.</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="panel p-4 h-100">
+      <h2 class="h5 font-serif mb-3">Thông tin người nhận</h2>
+      <dl class="mb-0">
+        <dt class="text-muted fw-medium">Họ và tên</dt><dd>{{ order.customer_name }}</dd>
+        <dt class="text-muted fw-medium">Số điện thoại</dt><dd>{{ order.customer_phone }}</dd>
+        {% if order.customer_email %}<dt class="text-muted fw-medium">Email</dt><dd>{{ order.customer_email }}</dd>{% endif %}
+        <dt class="text-muted fw-medium">Địa chỉ giao hàng</dt><dd style="white-space: pre-line;">{{ order.shipping_address }}</dd>
+        {% if order.note %}<dt class="text-muted fw-medium">Ghi chú</dt><dd style="white-space: pre-line;">{{ order.note }}</dd>{% endif %}
+        <dt class="text-muted fw-medium">Thanh toán</dt><dd>{{ order.payment_method|payment_label }}</dd>
+        <dt class="text-muted fw-medium">Đặt lúc</dt><dd class="mb-0">{{ order.created_at|dt }}</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="panel p-4 h-100">
+      <h2 class="h5 font-serif mb-3">Sách đã đặt</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Sách</th><th class="text-end">Đơn giá</th><th class="text-center">SL</th><th class="text-end">Thành tiền</th></tr></thead>
+          <tbody>
+            {% for item in order.items %}
+            <tr>
+              <td>{{ item.book.title }}</td>
+              <td class="text-end">{{ item.unit_price|vnd }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-end">{{ item.line_total|vnd }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between mb-1"><span>Tạm tính</span><span>{{ order.subtotal|vnd }}</span></div>
+      <div class="d-flex justify-content-between mb-1"><span>Phí giao hàng</span><span>{% if order.shipping_fee == 0 %}Miễn phí{% else %}{{ order.shipping_fee|vnd }}{% endif %}</span></div>
+      <hr>
+      <div class="d-flex justify-content-between fs-5 fw-bold"><span>Tổng thanh toán</span><span class="book-price">{{ order.total_amount|vnd }}</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="text-center mt-4">
+  <a href="{{ url_for('shop.books') }}" class="btn btn-primary px-4">Tiếp tục mua sách</a>
+</div>
+{% endblock %}

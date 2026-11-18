@@ -1,0 +1,90 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Đơn hàng #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 font-serif mb-0">Đơn hàng #{{ order.id }} {{ status_badge(order.status) }}</h1>
+  <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-secondary btn-sm">&lsaquo; Danh sách đơn hàng</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="panel p-4 mb-4">
+      <h2 class="h6 fw-semibold mb-3">Thông tin khách hàng</h2>
+      <dl class="row mb-0">
+        <dt class="col-sm-3 text-muted fw-medium">Họ và tên</dt><dd class="col-sm-9">{{ order.customer_name }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Số điện thoại</dt><dd class="col-sm-9">{{ order.customer_phone }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Email</dt><dd class="col-sm-9">{{ order.customer_email or '—' }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Địa chỉ</dt><dd class="col-sm-9" style="white-space: pre-line;">{{ order.shipping_address }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Ghi chú</dt><dd class="col-sm-9" style="white-space: pre-line;">{{ order.note or '—' }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Thanh toán</dt><dd class="col-sm-9">{{ order.payment_method|payment_label }}</dd>
+        <dt class="col-sm-3 text-muted fw-medium">Đặt lúc</dt><dd class="col-sm-9 mb-0">{{ order.created_at|dt }}</dd>
+      </dl>
+    </div>
+
+    <div class="table-wrap">
+      <div class="px-3 pt-3"><h2 class="h6 fw-semibold mb-0">Sách trong đơn</h2></div>
+      <div class="table-responsive">
+        <table class="table align-middle mt-2">
+          <thead><tr><th>Sách</th><th class="text-end">Đơn giá lúc đặt</th><th class="text-center">SL</th><th class="text-end">Thành tiền</th></tr></thead>
+          <tbody>
+            {% for item in order.items %}
+            <tr>
+              <td>{{ item.book.title }}</td>
+              <td class="text-end">{{ item.unit_price|vnd }}</td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-end">{{ item.line_total|vnd }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr><td colspan="3" class="text-end">Tạm tính</td><td class="text-end">{{ order.subtotal|vnd }}</td></tr>
+            <tr><td colspan="3" class="text-end">Phí giao hàng</td><td class="text-end">{{ order.shipping_fee|vnd }}</td></tr>
+            <tr><td colspan="3" class="text-end fw-bold">Tổng cộng</td><td class="text-end fw-bold">{{ order.total_amount|vnd }}</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4">
+    {% if forward_statuses or can_cancel %}
+    <div class="panel p-4 mb-4">
+      <h2 class="h6 fw-semibold mb-3">Cập nhật trạng thái</h2>
+      {% if forward_statuses %}
+      <form method="post" action="{{ url_for('admin.order_status', order_id=order.id) }}" class="mb-3">
+        {{ form.csrf_token }}
+        <label for="status" class="form-label">Chuyển sang</label>
+        <div class="input-group">
+          <select name="status" id="status" class="form-select">
+            {% for s in forward_statuses %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary">Cập nhật</button>
+        </div>
+      </form>
+      {% endif %}
+      {% if can_cancel %}
+      <form method="post" action="{{ url_for('admin.order_status', order_id=order.id) }}"
+            onsubmit="return confirm('Huỷ đơn hàng này? Tồn kho các sách trong đơn sẽ được hoàn lại.');">
+        {{ form.csrf_token }}
+        <input type="hidden" name="status" value="{{ cancelled_status }}">
+        <button type="submit" class="btn btn-outline-danger w-100">Huỷ đơn</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="panel p-4">
+      <h2 class="h6 fw-semibold mb-3">Lịch sử trạng thái</h2>
+      <ul class="timeline">
+        {% for h in order.history %}
+        <li>
+          <div>{{ status_badge(h.status) }}</div>
+          <div class="when">{{ h.changed_at|dt }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
